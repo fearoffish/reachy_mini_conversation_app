@@ -21,7 +21,6 @@ from openai.types.realtime import (
     RealtimeToolsConfigParam,
     RealtimeFunctionToolParam,
     RealtimeAudioConfigOutputParam,
-    RealtimeResponseCreateParamsParam,
     RealtimeSessionCreateRequestParam,
 )
 from websockets.exceptions import ConnectionClosedError
@@ -662,11 +661,7 @@ class BaseRealtimeHandler(ConversationHandler, ABC):
                     )
 
             if send_result_to_model:
-                await self._safe_response_create(
-                    response=RealtimeResponseCreateParamsParam(
-                        instructions="Use the tool result just returned and answer concisely in speech.",
-                    ),
-                )
+                await self._safe_response_create()
 
         except self._connection_closed_errors():
             logger.warning("Connection closed while sending tool result")
