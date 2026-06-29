@@ -36,7 +36,7 @@ export const ORB_STATES = Object.freeze({
 
 export const GLOW_BY_STATE = Object.freeze({
   [ORB_STATES.MUTED]: "#94a3b8",      // paused, waiting for the user
-  [ORB_STATES.IDLE]: "#34d399",       // ready / breathing
+  [ORB_STATES.IDLE]: "#34d399",       // ready / idle
   [ORB_STATES.CONNECTING]: "#facc15", // negotiating
   [ORB_STATES.LISTENING]: "#22d3ee",  // user speaks
   [ORB_STATES.THINKING]: "#f59e0b",   // model composes

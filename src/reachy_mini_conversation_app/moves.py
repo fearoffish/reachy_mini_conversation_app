@@ -1,12 +1,13 @@
 """Movement system driving sequential primary moves.
 
 Design overview
-- Primary moves (emotions, dances, goto, breathing) are mutually exclusive and run
+- Primary moves (emotions, dances, goto, idle) are mutually exclusive and run
   sequentially.
 - There is a single control point to the robot: `ReachyMini.set_target`.
 - The control loop runs near 100 Hz and is phase-aligned via a monotonic clock.
-- Idle behaviour starts an infinite `BreathingMove` after a short inactivity delay
-  unless listening is active.
+- Idle behaviour starts an infinite `IdleMove` after a short inactivity delay
+  unless listening is active. The robot holds still and only makes occasional,
+  subtle head movements (and far rarer antenna twitches).
 
 Threading model
 - A dedicated worker thread owns all real-time state and issues `set_target`
@@ -25,6 +26,7 @@ Safety
 
 from __future__ import annotations
 import time
+import random
 import logging
 import threading
 from queue import Empty, Queue
@@ -46,12 +48,56 @@ logger = logging.getLogger(__name__)
 # Configuration constants
 CONTROL_LOOP_FREQUENCY_HZ = 60.0  # Hz - Target frequency for the movement control loop
 
+# Idle motion tuning. When idle the robot stays still and only occasionally makes a
+# subtle head movement; antenna twitches are far rarer. All times are in seconds and
+# refer to the idle phase (after the initial interpolation to neutral).
+IDLE_HEAD_INTERVAL_S = (30.0, 60.0)  # random wait between subtle head gestures
+IDLE_HEAD_RISE_S = 1.5  # ease into the offset
+IDLE_HEAD_HOLD_S = 1.0  # dwell at the offset
+IDLE_HEAD_FALL_S = 1.5  # ease back to neutral
+IDLE_HEAD_ROLL_MAX_DEG = 3.0
+IDLE_HEAD_PITCH_MAX_DEG = 5.0
+IDLE_HEAD_YAW_MAX_DEG = 8.0
+
+IDLE_ANTENNA_INTERVAL_S = (60.0, 120.0)  # rarer than head gestures
+IDLE_ANTENNA_RISE_S = 0.25  # quick flick out
+IDLE_ANTENNA_FALL_S = 0.25  # quick flick back
+IDLE_ANTENNA_AMP_RAD = float(np.deg2rad(5.0))
+
+
+def _ease(x: float) -> float:
+    """Smooth 0->1 ease (raised cosine), clamped outside [0, 1]."""
+    if x <= 0.0:
+        return 0.0
+    if x >= 1.0:
+        return 1.0
+    return float(0.5 - 0.5 * np.cos(np.pi * x))
+
+
+def _gesture_envelope(local: float, rise: float, hold: float, fall: float) -> float:
+    """Return a 0->1->0 envelope: ramp up over `rise`, hold at 1 for `hold`, ramp down over `fall`."""
+    if local < 0.0:
+        return 0.0
+    if local < rise:
+        return _ease(local / rise)
+    if local < rise + hold:
+        return 1.0
+    if local < rise + hold + fall:
+        return _ease(1.0 - (local - rise - hold) / fall)
+    return 0.0
+
 # Type definitions
 FullBodyPose = Tuple[NDArray[np.float32], Tuple[float, float], float]  # (head_pose_4x4, antennas, body_yaw)
 
 
-class BreathingMove(Move):  # type: ignore
-    """Breathing move with interpolation to neutral and then continuous breathing patterns."""
+class IdleMove(Move):  # type: ignore
+    """Idle behaviour: hold a still neutral pose with occasional subtle motion.
+
+    After interpolating from the current pose to neutral, the robot stays still
+    rather than continuously breathing. Every 30-60s it eases its head to a small
+    random offset and back; far more rarely (60-120s) it does a brief, subtle
+    antenna twitch. There is no continuous body or antenna motion.
+    """
 
     def __init__(
         self,
@@ -59,7 +105,7 @@ class BreathingMove(Move):  # type: ignore
         interpolation_start_antennas: Tuple[float, float],
         interpolation_duration: float = 1.0,
     ):
-        """Initialize breathing move.
+        """Initialize idle move.
 
         Args:
             interpolation_start_pose: 4x4 matrix of current head pose to interpolate from
@@ -71,23 +117,68 @@ class BreathingMove(Move):  # type: ignore
         self.interpolation_start_antennas = np.array(interpolation_start_antennas)
         self.interpolation_duration = interpolation_duration
 
-        # Neutral positions for breathing base
+        # Neutral base positions (held still between gestures)
         self.neutral_head_pose = create_head_pose(0, 0, 0, 0, 0, 0, degrees=True)
         self.neutral_antennas = np.array([-0.1745, 0.1745])  # ~10° offset to reduce shaking
 
-        # Breathing parameters
-        self.breathing_z_amplitude = 0.005  # 5mm gentle breathing
-        self.breathing_frequency = 0.1  # Hz (6 breaths per minute)
-        self.antenna_sway_amplitude = np.deg2rad(15)  # 15 degrees
-        self.antenna_frequency = 0.5  # Hz (faster antenna sway)
+        # Schedule the first head gesture and antenna twitch. Times are in idle-phase
+        # seconds (i.e. measured from the end of the interpolation to neutral).
+        self._head_start = random.uniform(*IDLE_HEAD_INTERVAL_S)
+        self._head_target = self._random_head_target()
+        self._antenna_start = random.uniform(*IDLE_ANTENNA_INTERVAL_S)
+        self._antenna_sign = random.choice([-1.0, 1.0])
 
     @property
     def duration(self) -> float:
         """Duration property required by official Move interface."""
-        return float("inf")  # Continuous breathing (never ends naturally)
+        return float("inf")  # Idle behaviour runs until interrupted
+
+    @staticmethod
+    def _random_head_target() -> NDArray[np.float64]:
+        """Pick a small random (roll, pitch, yaw) head offset in degrees."""
+        return np.array(
+            [
+                random.uniform(-IDLE_HEAD_ROLL_MAX_DEG, IDLE_HEAD_ROLL_MAX_DEG),
+                random.uniform(-IDLE_HEAD_PITCH_MAX_DEG, IDLE_HEAD_PITCH_MAX_DEG),
+                random.uniform(-IDLE_HEAD_YAW_MAX_DEG, IDLE_HEAD_YAW_MAX_DEG),
+            ],
+            dtype=np.float64,
+        )
+
+    def _head_offset_deg(self, idle_time: float) -> tuple[float, float, float]:
+        """Return the (roll, pitch, yaw) head offset in degrees for the current idle time.
+
+        Eases to a random target, dwells, then eases back. When a gesture finishes the
+        next one is scheduled for 30-60s later.
+        """
+        span = IDLE_HEAD_RISE_S + IDLE_HEAD_HOLD_S + IDLE_HEAD_FALL_S
+        local = idle_time - self._head_start
+        if local >= span:
+            # Gesture complete: rest at neutral and schedule the next one.
+            self._head_start = idle_time + random.uniform(*IDLE_HEAD_INTERVAL_S)
+            self._head_target = self._random_head_target()
+            return 0.0, 0.0, 0.0
+        factor = _gesture_envelope(local, IDLE_HEAD_RISE_S, IDLE_HEAD_HOLD_S, IDLE_HEAD_FALL_S)
+        roll, pitch, yaw = self._head_target * factor
+        return float(roll), float(pitch), float(yaw)
+
+    def _antenna_delta_rad(self, idle_time: float) -> float:
+        """Return the symmetric antenna offset in radians for the current idle time.
+
+        A brief flick out and back; when it finishes the next twitch is scheduled for
+        60-120s later (rarer than head gestures).
+        """
+        span = IDLE_ANTENNA_RISE_S + IDLE_ANTENNA_FALL_S
+        local = idle_time - self._antenna_start
+        if local >= span:
+            self._antenna_start = idle_time + random.uniform(*IDLE_ANTENNA_INTERVAL_S)
+            self._antenna_sign = random.choice([-1.0, 1.0])
+            return 0.0
+        factor = _gesture_envelope(local, IDLE_ANTENNA_RISE_S, 0.0, IDLE_ANTENNA_FALL_S)
+        return self._antenna_sign * IDLE_ANTENNA_AMP_RAD * factor
 
     def evaluate(self, t: float) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None, float | None]:
-        """Evaluate breathing move at time t."""
+        """Evaluate idle move at time t."""
         if t < self.interpolation_duration:
             # Phase 1: Interpolate to neutral base position
             interpolation_t = t / self.interpolation_duration
@@ -106,16 +197,15 @@ class BreathingMove(Move):  # type: ignore
             antennas = antennas_interp.astype(np.float64)
 
         else:
-            # Phase 2: Breathing patterns from neutral base
-            breathing_time = t - self.interpolation_duration
+            # Phase 2: Hold still at neutral, with occasional subtle head movements
+            # and far rarer antenna twitches. No continuous body or antenna motion.
+            idle_time = t - self.interpolation_duration
 
-            # Gentle z-axis breathing
-            z_offset = self.breathing_z_amplitude * np.sin(2 * np.pi * self.breathing_frequency * breathing_time)
-            head_pose = create_head_pose(x=0, y=0, z=z_offset, roll=0, pitch=0, yaw=0, degrees=True, mm=False)
+            roll, pitch, yaw = self._head_offset_deg(idle_time)
+            head_pose = create_head_pose(x=0, y=0, z=0, roll=roll, pitch=pitch, yaw=yaw, degrees=True, mm=False)
 
-            # Antenna sway (opposite directions)
-            antenna_sway = self.antenna_sway_amplitude * np.sin(2 * np.pi * self.antenna_frequency * breathing_time)
-            antennas = np.array([antenna_sway, -antenna_sway], dtype=np.float64)
+            antenna_delta = self._antenna_delta_rad(idle_time)
+            antennas = (self.neutral_antennas + antenna_delta).astype(np.float64)
 
         # Return in official Move interface format: (head_pose, antennas_array, body_yaw)
         return (head_pose, antennas, 0.0)
@@ -169,7 +259,7 @@ class MovementManager:
     Responsibilities:
     - Own a real-time loop that samples the current primary move (if any) and calls
       `set_target` exactly once per tick.
-    - Start an idle `BreathingMove` after `idle_inactivity_delay` when not
+    - Start an idle `IdleMove` after `idle_inactivity_delay` when not
       listening and no moves are queued.
     - Expose thread-safe APIs so other threads can enqueue moves or mark activity
       without touching internal state.
@@ -215,7 +305,7 @@ class MovementManager:
         self._antenna_unfreeze_blend = 1.0
         self._antenna_blend_duration = 0.4  # seconds to blend back after listening
         self._last_listening_blend_time = self._now()
-        self._breathing_active = False  # true when breathing move is running or queued
+        self._idle_active = False  # true when idle move is running or queued
         self._listening_debounce_s = 0.15
         self._last_listening_toggle_time = self._now()
         self._last_set_target_err = 0.0
@@ -250,7 +340,7 @@ class MovementManager:
     def set_moving_state(self, duration: float) -> None:
         """Mark the robot as actively moving for the provided duration.
 
-        Legacy hook used by goto helpers to keep inactivity and breathing logic
+        Legacy hook used by goto helpers to keep inactivity and idle logic
         aware of manual motions. Thread-safe via the command queue.
         """
         self._command_queue.put(("set_moving_state", duration))
@@ -272,7 +362,7 @@ class MovementManager:
         While listening:
         - Antenna positions are frozen at the last commanded values.
         - Blending is reset so that upon unfreezing the antennas return smoothly.
-        - Idle breathing is suppressed.
+        - Idle behaviour is suppressed.
 
         Thread-safe: the change is posted to the worker command queue.
         """
@@ -315,7 +405,7 @@ class MovementManager:
             self.move_queue.clear()
             self.state.current_move = None
             self.state.move_start_time = None
-            self._breathing_active = False
+            self._idle_active = False
             logger.info("Cleared move queue and stopped current move")
         elif command == "set_moving_state":
             try:
@@ -370,17 +460,17 @@ class MovementManager:
             if self.move_queue:
                 self.state.current_move = self.move_queue.popleft()
                 self.state.move_start_time = current_time
-                # Any real move cancels breathing mode flag
-                self._breathing_active = isinstance(self.state.current_move, BreathingMove)
+                # Any real move cancels idle mode flag
+                self._idle_active = isinstance(self.state.current_move, IdleMove)
                 logger.debug(f"Starting new move, duration: {self.state.current_move.duration}s")
 
-    def _manage_breathing(self, current_time: float) -> None:
-        """Manage automatic breathing when idle."""
+    def _manage_idle(self, current_time: float) -> None:
+        """Manage automatic idle behaviour when inactive."""
         if (
             self.state.current_move is None
             and not self.move_queue
             and not self._is_listening
-            and not self._breathing_active
+            and not self._idle_active
         ):
             idle_for = current_time - self.state.last_activity_time
             if idle_for >= self.idle_inactivity_delay:
@@ -390,28 +480,28 @@ class MovementManager:
                     _, current_antennas = self.current_robot.get_current_joint_positions()
                     current_head_pose = self.current_robot.get_current_head_pose()
 
-                    self._breathing_active = True
+                    self._idle_active = True
                     self.state.update_activity()
 
-                    breathing_move = BreathingMove(
+                    idle_move = IdleMove(
                         interpolation_start_pose=current_head_pose,
                         interpolation_start_antennas=current_antennas,
                         interpolation_duration=1.0,
                     )
-                    self.move_queue.append(breathing_move)
-                    logger.debug("Started breathing after %.1fs of inactivity", idle_for)
+                    self.move_queue.append(idle_move)
+                    logger.debug("Started idle behaviour after %.1fs of inactivity", idle_for)
                 except Exception as e:
-                    self._breathing_active = False
-                    logger.error("Failed to start breathing: %s", e)
+                    self._idle_active = False
+                    logger.error("Failed to start idle behaviour: %s", e)
 
-        if isinstance(self.state.current_move, BreathingMove) and self.move_queue:
+        if isinstance(self.state.current_move, IdleMove) and self.move_queue:
             self.state.current_move = None
             self.state.move_start_time = None
-            self._breathing_active = False
-            logger.debug("Stopping breathing due to new move activity")
+            self._idle_active = False
+            logger.debug("Stopping idle behaviour due to new move activity")
 
-        if self.state.current_move is not None and not isinstance(self.state.current_move, BreathingMove):
-            self._breathing_active = False
+        if self.state.current_move is not None and not isinstance(self.state.current_move, IdleMove):
+            self._idle_active = False
 
     def _get_primary_pose(self, current_time: float) -> FullBodyPose:
         """Get the primary full body pose from current move or neutral."""
@@ -449,7 +539,7 @@ class MovementManager:
     def _update_primary_motion(self, current_time: float) -> None:
         """Advance queue state and idle behaviours for this tick."""
         self._manage_move_queue(current_time)
-        self._manage_breathing(current_time)
+        self._manage_idle(current_time)
 
     def _calculate_blended_antennas(self, target_antennas: Tuple[float, float]) -> Tuple[float, float]:
         """Blend target antennas with listening freeze state and update blending."""
@@ -638,7 +728,7 @@ class MovementManager:
         return {
             "queue_size": len(self.move_queue),
             "is_listening": self._is_listening,
-            "breathing_active": self._breathing_active,
+            "idle_active": self._idle_active,
             "last_commanded_pose": {
                 "head": head_matrix,
                 "antennas": antennas,
@@ -673,7 +763,7 @@ class MovementManager:
             # 1) Poll external commands
             self._poll_signals(loop_start)
 
-            # 2) Manage the primary move queue (start new move, end finished move, breathing)
+            # 2) Manage the primary move queue (start new move, end finished move, idle)
             self._update_primary_motion(loop_start)
 
             # 3) Build the primary full-body pose for this tick
