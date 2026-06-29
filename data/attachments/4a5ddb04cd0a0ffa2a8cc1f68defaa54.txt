@@ -1,0 +1,2 @@
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:285 BackgroundToolManager started. Max tool execution duration: 86400 seconds (tools running longer will be auto-cancelled). Max tool memory retention: 3600 seconds (completed/failed/cancelled tools older than this are purged).
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: multi (id=c1)

@@ -1,0 +1,2 @@
+WARNING  reachy_mini_conversation_app.tools.core_tools:core_tools.py:388 Space 'pollen-robotics/reachy-mini-search-tool' is unavailable, skipping its tools (pollen_robotics_reachy_mini_search_tool__search_web): boom
+WARNING  reachy_mini_conversation_app.tools.core_tools:core_tools.py:478 ⚠️ Tool 'pollen_robotics_reachy_mini_search_tool__search_web' not found in profile or shared tools

@@ -1,0 +1,1 @@
+{"id":"097ba8ecfb92d627ffb7b61aac6f6466","fullName":"tests.test_huggingface_realtime#test_build_realtime_client_uses_deployed_mode_even_when_direct_hf_ws_url_is_saved","name":"test_build_realtime_client_uses_deployed_mode_even_when_direct_hf_ws_url_is_saved","status":"passed","testResultsByEnv":{"default":"df80befb42574681ebf622142b60a736"}}

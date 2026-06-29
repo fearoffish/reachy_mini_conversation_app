@@ -1,0 +1,7 @@
+ERROR    reachy_mini_conversation_app.base_realtime:base_realtime.py:730 Realtime session.update failed; aborting startup
+Traceback (most recent call last):
+  File "/home/runner/work/reachy_mini_conversation_app/reachy_mini_conversation_app/src/reachy_mini_conversation_app/base_realtime.py", line 722, in _run_realtime_session
+    await conn.session.update(session=session_config)
+  File "/home/runner/work/reachy_mini_conversation_app/reachy_mini_conversation_app/tests/test_openai_realtime.py", line 739, in update
+    raise RuntimeError("invalid session config")
+RuntimeError: invalid session config

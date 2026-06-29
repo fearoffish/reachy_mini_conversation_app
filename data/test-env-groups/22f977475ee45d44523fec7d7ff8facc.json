@@ -1,0 +1,1 @@
+{"id":"22f977475ee45d44523fec7d7ff8facc","fullName":"tests.test_mcp_client#test_validate_http_mcp_url_rejects_non_http_scheme","name":"test_validate_http_mcp_url_rejects_non_http_scheme","status":"passed","testResultsByEnv":{"default":"129eeeaa7dba2561cb1c3182304656b5"}}

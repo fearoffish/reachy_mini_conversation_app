@@ -1,0 +1,1 @@
+{"id":"d4e8f3307cb723e6628a0d0ddbfe2de7","fullName":"tests.test_idle_policy#test_choose_idle_tool_call_keeps_args_with_weighted_candidate","name":"test_choose_idle_tool_call_keeps_args_with_weighted_candidate","status":"passed","testResultsByEnv":{"default":"1cf0b0fa5e019a8801f63211f897be73"}}

@@ -1,0 +1,2 @@
+INFO     reachy_mini_conversation_app.tools.play_emotion:play_emotion.py:264 Tool call: play_emotion emotion=contento
+INFO     reachy_mini_conversation_app.tools.play_emotion:play_emotion.py:277 play_emotion: 'contento' did not resolve; using random curated

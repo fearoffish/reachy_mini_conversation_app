@@ -1,0 +1,2 @@
+WARNING  reachy_mini_conversation_app.base_realtime:base_realtime.py:202 Ignoring unsupported session voice 'cedar' for backend='huggingface'; expected one of ['Aiden', 'Ryan', 'Dylan', 'Eric', 'Ono_Anna', 'Serena', 'Sohee', 'Uncle_Fu', 'Vivian']
+WARNING  reachy_mini_conversation_app.base_realtime:base_realtime.py:202 Ignoring unsupported session voice 'cedar' for backend='huggingface'; expected one of ['Aiden', 'Ryan', 'Dylan', 'Eric', 'Ono_Anna', 'Serena', 'Sohee', 'Uncle_Fu', 'Vivian']

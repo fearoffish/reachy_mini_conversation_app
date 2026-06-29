@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.audio.startup_config:startup_config.py:58 Reachy audio startup config was not applied.

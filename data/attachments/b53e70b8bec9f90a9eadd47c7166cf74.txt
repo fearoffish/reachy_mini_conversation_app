@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.audio.startup_config:startup_config.py:52 Skipping Reachy audio startup config: SDK audio config failed: audio board unavailable

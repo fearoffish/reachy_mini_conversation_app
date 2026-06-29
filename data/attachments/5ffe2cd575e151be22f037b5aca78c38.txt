@@ -1,0 +1,2 @@
+WARNING  reachy_mini_conversation_app.tools.core_tools:core_tools.py:315 tools.txt not found for profile 'inherit_default' at /tmp/pytest-of-runner/pytest-0/test_initialize_tools_inherits0/external_profiles/inherit_default/tools.txt. Falling back to default profile tools at /home/runner/work/reachy_mini_conversation_app/reachy_mini_conversation_app/profiles/default/tools.txt
+WARNING  reachy_mini_conversation_app.tools.core_tools:core_tools.py:478 ⚠️ Tool 'sweep_look' not found in profile or shared tools

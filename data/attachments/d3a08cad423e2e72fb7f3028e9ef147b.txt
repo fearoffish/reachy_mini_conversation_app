@@ -1,0 +1,2 @@
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: first (id=1)
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: second (id=2)

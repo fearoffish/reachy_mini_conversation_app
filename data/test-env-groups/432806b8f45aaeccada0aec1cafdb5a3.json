@@ -1,0 +1,1 @@
+{"id":"432806b8f45aaeccada0aec1cafdb5a3","fullName":"tests.test_idle_policy#test_choose_idle_tool_call_rejects_same_name_with_unmatched_class","name":"test_choose_idle_tool_call_rejects_same_name_with_unmatched_class","status":"passed","testResultsByEnv":{"default":"36c6d2cd1136af68bed09ebbc632f48f"}}

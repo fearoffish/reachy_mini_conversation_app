@@ -1,0 +1,1 @@
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: ok_tool (id=c1)

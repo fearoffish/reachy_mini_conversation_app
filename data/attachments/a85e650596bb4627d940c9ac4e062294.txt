@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.console:console.py:824 huggingface backend failed to start: local server unavailable. Settings UI remains available; retrying in 0.0 seconds.

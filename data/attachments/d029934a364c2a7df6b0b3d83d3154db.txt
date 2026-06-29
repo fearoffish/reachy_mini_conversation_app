@@ -1,0 +1,8 @@
+2026-06-29 12:44:01,213 INFO reachy_mini_conversation_app.tool_spaces:335 | Installed Space tool source: pollen-robotics/reachy-mini-search-tool
+2026-06-29 12:44:01,213 INFO reachy_mini_conversation_app.tool_spaces:336 | Manifest: external_content/installed_tool_spaces.json
+2026-06-29 12:44:01,213 INFO reachy_mini_conversation_app.tool_spaces:337 | pollen-robotics/reachy-mini-search-tool (pollen_robotics_reachy_mini_search_tool)
+  MCP endpoint: https://pollen-robotics-reachy-mini-search-tool.hf.space/gradio_api/mcp/
+  Tools:
+    - pollen_robotics_reachy_mini_search_tool__search_web
+2026-06-29 12:44:01,213 INFO reachy_mini_conversation_app.tool_spaces:340 | Tools installed. Add tool IDs to a profile's tools.txt to enable them.
+2026-06-29 12:44:01,216 ERROR reachy_mini_conversation_app.tool_spaces:318 | Cannot install 'pollen_robotics/reachy-mini-search-tool': its local alias 'pollen_robotics_reachy_mini_search_tool' conflicts with already-installed 'pollen-robotics/reachy-mini-search-tool'. Rename one Space on Hugging Face to get a distinct alias.

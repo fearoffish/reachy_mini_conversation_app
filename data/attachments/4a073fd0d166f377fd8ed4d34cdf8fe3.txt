@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.config:config.py:214 Ignoring invalid REACHY_MINI_APP_TIMEOUT_MINUTES='soon'; using default.

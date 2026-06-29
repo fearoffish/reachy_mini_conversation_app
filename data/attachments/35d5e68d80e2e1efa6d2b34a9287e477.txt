@@ -1,0 +1,7 @@
+2026-06-29 12:44:01,224 INFO reachy_mini_conversation_app.tool_spaces:335 | Installed Space tool source: pollen-robotics/reachy-mini-search-tool
+2026-06-29 12:44:01,225 INFO reachy_mini_conversation_app.tool_spaces:336 | Manifest: external_content/installed_tool_spaces.json
+2026-06-29 12:44:01,225 INFO reachy_mini_conversation_app.tool_spaces:337 | pollen-robotics/reachy-mini-search-tool (pollen_robotics_reachy_mini_search_tool)
+  MCP endpoint: https://pollen-robotics-reachy-mini-search-tool.hf.space/gradio_api/mcp/
+  Tools:
+    - pollen_robotics_reachy_mini_search_tool__search_web
+2026-06-29 12:44:01,225 INFO reachy_mini_conversation_app.tool_spaces:356 | Enabled in profile 'default': ['pollen_robotics_reachy_mini_search_tool__search_web']

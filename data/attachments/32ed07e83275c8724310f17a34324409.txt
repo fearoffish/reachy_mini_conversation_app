@@ -1,0 +1,7 @@
+INFO     reachy_mini_conversation_app.tool_spaces:tool_spaces.py:335 Installed Space tool source: pollen-robotics/reachy-mini-search-tool
+INFO     reachy_mini_conversation_app.tool_spaces:tool_spaces.py:336 Manifest: /tmp/pytest-of-runner/pytest-0/test_tool_spaces_manifest_uses0/installed_tool_spaces.json
+INFO     reachy_mini_conversation_app.tool_spaces:tool_spaces.py:337 pollen-robotics/reachy-mini-search-tool (pollen_robotics_reachy_mini_search_tool)
+  MCP endpoint: https://pollen-robotics-reachy-mini-search-tool.hf.space/gradio_api/mcp/
+  Tools:
+    - pollen_robotics_reachy_mini_search_tool__search_web
+INFO     reachy_mini_conversation_app.tool_spaces:tool_spaces.py:340 Tools installed. Add tool IDs to a profile's tools.txt to enable them.

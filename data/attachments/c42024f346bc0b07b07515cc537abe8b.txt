@@ -1,0 +1,1 @@
+ERROR    reachy_mini_conversation_app.base_realtime:base_realtime.py:933 Realtime error [input_audio_buffer_commit_empty]: empty audio buffer (raw=namespace(code='input_audio_buffer_commit_empty', message='empty audio buffer'))

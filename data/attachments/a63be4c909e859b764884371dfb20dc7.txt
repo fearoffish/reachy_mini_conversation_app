@@ -1,0 +1,2 @@
+DEBUG    reachy_mini_conversation_app.base_realtime:base_realtime.py:537 Timed out waiting for previous response to finish; forcing ahead
+DEBUG    reachy_mini_conversation_app.base_realtime:base_realtime.py:558 Timed out waiting for response.created or response rejection

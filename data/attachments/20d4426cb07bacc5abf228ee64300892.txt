@@ -1,0 +1,2 @@
+WARNING  reachy_mini_conversation_app.openai_realtime:openai_realtime.py:132 OPENAI_API_KEY missing. Proceeding with a placeholder (tests/offline).
+WARNING  reachy_mini_conversation_app.base_realtime:base_realtime.py:409 Realtime websocket closed unexpectedly (attempt 1/3): abrupt close (simulated)

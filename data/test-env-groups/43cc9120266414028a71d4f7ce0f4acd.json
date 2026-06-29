@@ -1,0 +1,1 @@
+{"id":"43cc9120266414028a71d4f7ce0f4acd","fullName":"tests.test_openai_realtime#test_empty_audio_buffer_error_exits_listening_without_chat_error","name":"test_empty_audio_buffer_error_exits_listening_without_chat_error","status":"passed","testResultsByEnv":{"default":"3d5ee1d1a68a508d683f45ea69fa6492"}}

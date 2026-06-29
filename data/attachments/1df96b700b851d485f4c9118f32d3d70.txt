@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.console:console.py:882 OPENAI_API_KEY not found. Open the app settings page to configure it.

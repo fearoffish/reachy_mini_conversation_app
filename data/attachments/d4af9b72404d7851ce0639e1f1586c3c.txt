@@ -1,0 +1,1 @@
+WARNING  reachy_mini_conversation_app.gemini_live:gemini_live.py:446 Gemini session does not support send_client_content; startup greeting skipped
