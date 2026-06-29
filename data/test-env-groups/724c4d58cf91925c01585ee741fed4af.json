@@ -1,1 +1,1 @@
-{"id":"724c4d58cf91925c01585ee741fed4af","fullName":"tests.test_mcp_client#test_validate_http_mcp_url_rejects_non_local_plain_http","name":"test_validate_http_mcp_url_rejects_non_local_plain_http","status":"passed","testResultsByEnv":{"default":"06c7ae7b450ecf04035109947da40e0d"}}
+{"id":"724c4d58cf91925c01585ee741fed4af","fullName":"tests.test_mcp_client#test_validate_http_mcp_url_rejects_non_local_plain_http","name":"test_validate_http_mcp_url_rejects_non_local_plain_http","status":"passed","testResultsByEnv":{"default":"fca07e84c6f29f1cbcfa45c0b68f680b"}}

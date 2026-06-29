@@ -1,0 +1,1 @@
+2026-06-29 13:52:08,220 WARNING reachy_mini_conversation_app.tools.background_tool_manager:239 | Cannot cancel tool does-not-exist: not found

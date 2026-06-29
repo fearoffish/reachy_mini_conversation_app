@@ -1,2 +1,0 @@
-INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: done (id=c1)
-WARNING  reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:244 Cannot cancel tool done-c1-156.685319: status is completed

@@ -1,0 +1,2 @@
+2026-06-29 13:52:08,991 INFO reachy_mini_conversation_app.tools.background_tool_manager:285 | BackgroundToolManager started. Max tool execution duration: 86400 seconds (tools running longer will be auto-cancelled). Max tool memory retention: 3600 seconds (completed/failed/cancelled tools older than this are purged).
+2026-06-29 13:52:08,992 INFO reachy_mini_conversation_app.tools.background_tool_manager:163 | Started background tool: ping (id=c1)

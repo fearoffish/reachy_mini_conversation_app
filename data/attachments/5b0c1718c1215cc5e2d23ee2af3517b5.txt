@@ -1,0 +1,2 @@
+2026-06-29 13:52:08,620 INFO reachy_mini_conversation_app.tools.background_tool_manager:163 | Started background tool: still_going (id=c1)
+2026-06-29 13:52:08,620 INFO reachy_mini_conversation_app.tools.background_tool_manager:250 | Cancelled tool: still_going (id=still_going-c1-303.886953741)

@@ -1,1 +1,1 @@
-{"id":"65217a384bddc7682eb6f55c776b18e6","fullName":"tests.test_openai_realtime#test_handler_uses_openai_sample_rate_for_openai_backend","name":"test_handler_uses_openai_sample_rate_for_openai_backend","status":"passed","testResultsByEnv":{"default":"393418627ef7d1c8cf0f9b3f33a8c13b"}}
+{"id":"65217a384bddc7682eb6f55c776b18e6","fullName":"tests.test_openai_realtime#test_handler_uses_openai_sample_rate_for_openai_backend","name":"test_handler_uses_openai_sample_rate_for_openai_backend","status":"passed","testResultsByEnv":{"default":"ca008c9ecc50b5ee51cd806ca6f68021"}}

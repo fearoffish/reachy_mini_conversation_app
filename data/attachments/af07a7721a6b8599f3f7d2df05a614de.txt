@@ -1,0 +1,2 @@
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:163 Started background tool: prog (id=c1)
+INFO     reachy_mini_conversation_app.tools.background_tool_manager:background_tool_manager.py:250 Cancelled tool: prog (id=prog-c1-303.305800733)

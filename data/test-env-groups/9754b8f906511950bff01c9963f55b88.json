@@ -1,1 +1,1 @@
-{"id":"9754b8f906511950bff01c9963f55b88","fullName":"tests.test_console#test_backend_config_persists_gemini_selection_and_status","name":"test_backend_config_persists_gemini_selection_and_status","status":"passed","testResultsByEnv":{"default":"7e869992a5162af88345e2540b810186"}}
+{"id":"9754b8f906511950bff01c9963f55b88","fullName":"tests.test_console#test_backend_config_persists_gemini_selection_and_status","name":"test_backend_config_persists_gemini_selection_and_status","status":"passed","testResultsByEnv":{"default":"21cb5d342eacbbb186c2e794d99bcec0"}}
